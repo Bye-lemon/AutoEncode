@@ -1,5 +1,6 @@
 import os
 import random
+from tqdm import tqdm
 
 import numpy as np
 
@@ -79,18 +80,26 @@ autocoder = torch.load('autoencoder.pkl')
 trainY = torch.empty(num_train, TARGET_DIM)
 trainLabel = anchor_data.targets.numpy()
 
+print('after mking empty trainY')
+
 testY = torch.empty(num_test, TARGET_DIM)
 testLable = test_data.targets.numpy()
+
+print('after mking empty testY')
 
 for index, (x, label) in enumerate(anchor_data):
   x = x.view(-1, 28 * 28)
   encoded = autocoder.encoder(x)
   trainY[index] = encoded
 
+print('after mking trainY')
+
 for index, (x, label) in enumerate(test_data):
   x = x.view(-1, 28 * 28)
   encoded = autocoder.encoder(x)
   testY[index] = encoded
+
+print('after mking testY')
 
 trainY = trainY.detach().numpy()
 testY = testY.detach().numpy()
@@ -98,21 +107,29 @@ testY = testY.detach().numpy()
 trainY = compactBit(trainY)
 testY = compactBit(testY)
 
+print('after compact')
+
 ntrain = trainY.shape[0]
 ntest = testY.shape[0]
 Wture = np.zeros((ntrain, ntest))
-for i in range(ntrain):
+
+print('calculating Wtrue')
+
+for i in tqdm(range(ntrain)):
     for j in range(ntest):
         if trainLabel[i] == testLable[j]:
             Wture[i, j] = 1
 
+print('calculating hamming dist')
 hamdis = hamming_dist(trainY, testY)
 
-for i in range(ntest):
+print('finding nearest neighbors')
+for i in tqdm(range(ntest)):
     index_ = hamdis[:, i].argsort()
     Wture[:, i] = Wture[index_, i]
 
-pos = 10
+print('calculating precision')
+pos = 3
 retrieved_good_pairs = Wture[:pos, :].sum()
 row, col = Wture[:pos, :].shape
 total_pairs = row * col
