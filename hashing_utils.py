@@ -29,7 +29,7 @@ def recall_precision(trainY, testY, traingnd, testgnd, Wtrue):
     precision = np.zeros(max_hamm)
     recall = np.zeros(max_hamm)
 
-    for redius in range(max_hamm):
+    for redius in tqdm(range(max_hamm)):
         TestTrue = np.zeros((ntrain, ntest))
         TestTrue[hamdis <= redius+0.00001] = 1
 
@@ -61,7 +61,7 @@ def recall_precision5(trainY, testY, traingnd, testgnd, pos, Wtrue):
     precision = np.zeros(npos)
 
     # pylint: disable=unpacking-non-sequence
-    for i in range(npos):
+    for i in tqdm(range(npos)):
         g = pos[i]
         retrieved_good_pairs = Wtrue[:g, :].sum()
         row, col = Wtrue[:g, :].shape
