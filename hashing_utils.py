@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 def compactBit(A):
   B = np.zeros((A.shape[0], A.shape[1]))
@@ -52,7 +53,7 @@ def recall_precision5(trainY, testY, traingnd, testgnd, pos, Wtrue):
 
     for i in range(ntest):
         index_ = hamdis[:, i].argsort()
-        Wture[:, i] = Wtrue[index_, i]
+        Wtrue[:, i] = Wtrue[index_, i]
 
     total_good_pairs = Wtrue.sum()
 

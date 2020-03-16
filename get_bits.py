@@ -4,10 +4,8 @@ import torch
 
 def get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, autocoder):
   trainY = torch.empty(num_train, TARGET_DIM)
-  trainLabel = anchor_data.targets.numpy()
 
   testY = torch.empty(num_test, TARGET_DIM)
-  testLable = test_data.targets.numpy()
 
   for index, (x, label) in enumerate(anchor_data):
     x = x.view(-1, 28 * 28)
@@ -29,4 +27,4 @@ def get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, autocoder):
   trainY = compactBit(trainY)
   testY = compactBit(testY)
 
-  return trainY, testY, trainLabel, testLable
+  return trainY, testY

@@ -18,7 +18,11 @@ anchor_data, train_data, test_data, num_train, num_test = load_data(DATASETPATH,
 
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 
+trainLabel = anchor_data.targets.numpy()
+testLabel = test_data.targets.numpy()
+
 # for evaluation
+Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
@@ -37,10 +41,9 @@ for TARGET_DIM in DIMS:
   process(autocoder, optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T)
 
   # get bit
-  trainY, testY, trainLabel, testLabel = get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, autocoder)
+  trainY, testY = get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, autocoder)
 
   # for evaluation
-  Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 
   precision, recall, pre, rec, mAP = evaluate(num_train, num_test, trainY, testY, trainLabel, testLabel, Wtrue, POSES)
 
