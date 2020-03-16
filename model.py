@@ -15,11 +15,11 @@ class AutoEncoder(nn.Module):
       nn.Tanh(),
       nn.Linear(128, 64),
       nn.Tanh(),
-      nn.Linear(64, TARGET_DIM),
+      nn.Linear(64, target_dim),
       nn.Sigmoid(),
     )
     self.decoder = nn.Sequential(
-      nn.Linear(TARGET_DIM, 64),
+      nn.Linear(target_dim, 64),
       nn.Tanh(),
       nn.Linear(64, 128),
       nn.Tanh(),
