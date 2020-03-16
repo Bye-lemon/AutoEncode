@@ -1,10 +1,10 @@
-from parameter import DATASETPATH
+import os
+import random
 
-def load_data(dataset_path):
+import torch
+import torchvision
 
-  if not(os.path.exists(dataset_path)) or not os.listdir(dataset_path):
-    # nor dir or dir is empty
-    DOWNLOAD = True
+def load_data(dataset_path, DOWNLOAD):
 
   # 载入anchor数据
   anchor_data = torchvision.datasets.FashionMNIST(

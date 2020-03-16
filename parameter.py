@@ -1,6 +1,9 @@
 DATASETNAME = 'FashionMnist'
 DATASETPATH = './fashion_mnist/'
 DOWNLOAD = False
+if not(os.path.exists(DATASETPATH)) or not os.listdir(DATASETPATH):
+  # nor dir or dir is empty
+  DOWNLOAD = True
 
 EPOCH = 10
 BATCH_SIZE = 50

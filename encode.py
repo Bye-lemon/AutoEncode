@@ -1,7 +1,3 @@
-import os
-import random
-from tqdm import tqdm
-
 import numpy as np
 
 import torch
@@ -18,7 +14,7 @@ from get_bits import get_bit
 from evaluate import evaluate
 from plot_graph import plot_graph
 
-anchor_data, train_data, test_data, num_train, num_test = load_data(DATASETPATH)
+anchor_data, train_data, test_data, num_train, num_test = load_data(DATASETPATH, DOWNLOAD)
 
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 

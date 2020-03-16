@@ -1,4 +1,6 @@
 from hashing_utils import compactBit
+import torch
+
 
 def get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, autocoder):
   trainY = torch.empty(num_train, TARGET_DIM)
