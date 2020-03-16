@@ -14,7 +14,7 @@ def hamming_dist(X, Y):
     hamdis = hashbits - ((hashbits + Xint.dot(Yint.T)) / 2)
     return hamdis
 
-def recall_precision(trainY, testY, traingnd, testgnd, Wtrue):
+def recall_precision(trainY, testY, traingnd, testgnd, Wtrue, hamdis):
     # make sure trangnd and testgnd are flattened
     testgnd = testgnd.ravel()
     traingnd = traingnd.ravel()
@@ -23,7 +23,6 @@ def recall_precision(trainY, testY, traingnd, testgnd, Wtrue):
 
     total_good_pairs = Wtrue.sum()
 
-    hamdis = hamming_dist(trainY, testY)
     max_hamm = int(hamdis.max())
     
     precision = np.zeros(max_hamm)
@@ -41,15 +40,13 @@ def recall_precision(trainY, testY, traingnd, testgnd, Wtrue):
 
     return precision, recall
 
-def recall_precision5(trainY, testY, traingnd, testgnd, pos, Wtrue):
+def recall_precision5(trainY, testY, traingnd, testgnd, pos, Wtrue, hamdis):
     # make sure trangnd and testgnd are flattened
     testgnd = testgnd.ravel()
     traingnd = traingnd.ravel()
     ntrain = trainY.shape[0]
     ntest = testY.shape[0]
     npos = len(pos)
-
-    hamdis = hamming_dist(trainY, testY)
 
     for i in range(ntest):
         index_ = hamdis[:, i].argsort()
