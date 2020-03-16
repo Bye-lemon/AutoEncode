@@ -13,20 +13,14 @@ def hamming_dist(X, Y):
     hamdis = hashbits - ((hashbits + Xint.dot(Yint.T)) / 2)
     return hamdis
 
-def recall_precision(trainY, testY, traingnd, testgnd):
+def recall_precision(trainY, testY, traingnd, testgnd, Wtrue):
     # make sure trangnd and testgnd are flattened
     testgnd = testgnd.ravel()
     traingnd = traingnd.ravel()
     ntrain = trainY.shape[0]
     ntest = testY.shape[0]
 
-    Wture = np.zeros((ntrain, ntest))
-    for i in range(ntrain):
-        for j in range(ntest):
-            if traingnd[i] == testgnd[j]:
-                Wture[i, j] = 1
-
-    total_good_pairs = Wture.sum()
+    total_good_pairs = Wtrue.sum()
 
     hamdis = hamming_dist(trainY, testY)
     max_hamm = int(hamdis.max())
@@ -38,7 +32,7 @@ def recall_precision(trainY, testY, traingnd, testgnd):
         TestTrue = np.zeros((ntrain, ntest))
         TestTrue[hamdis <= redius+0.00001] = 1
 
-        retrieved_good_pairs = Wture[TestTrue>0].sum()
+        retrieved_good_pairs = Wtrue[TestTrue>0].sum()
         retrieved_pairs = TestTrue.sum()
 
         precision[redius] = retrieved_good_pairs / (retrieved_pairs + 1e-3)
@@ -46,7 +40,7 @@ def recall_precision(trainY, testY, traingnd, testgnd):
 
     return precision, recall
 
-def recall_precision5(trainY, testY, traingnd, testgnd, pos):
+def recall_precision5(trainY, testY, traingnd, testgnd, pos, Wtrue):
     # make sure trangnd and testgnd are flattened
     testgnd = testgnd.ravel()
     traingnd = traingnd.ravel()
@@ -54,19 +48,13 @@ def recall_precision5(trainY, testY, traingnd, testgnd, pos):
     ntest = testY.shape[0]
     npos = len(pos)
 
-    Wture = np.zeros((ntrain, ntest))
-    for i in range(ntrain):
-        for j in range(ntest):
-            if traingnd[i] == testgnd[j]:
-                Wture[i, j] = 1
-
     hamdis = hamming_dist(trainY, testY)
 
     for i in range(ntest):
         index_ = hamdis[:, i].argsort()
-        Wture[:, i] = Wture[index_, i]
+        Wture[:, i] = Wtrue[index_, i]
 
-    total_good_pairs = Wture.sum()
+    total_good_pairs = Wtrue.sum()
 
     recall = np.zeros(npos)
     precision = np.zeros(npos)
@@ -74,8 +62,8 @@ def recall_precision5(trainY, testY, traingnd, testgnd, pos):
     # pylint: disable=unpacking-non-sequence
     for i in range(npos):
         g = pos[i]
-        retrieved_good_pairs = Wture[:g, :].sum()
-        row, col = Wture[:g, :].shape
+        retrieved_good_pairs = Wtrue[:g, :].sum()
+        row, col = Wtrue[:g, :].shape
         total_pairs = row * col
         recall[i] = retrieved_good_pairs / total_good_pairs
         precision[i] = retrieved_good_pairs / (total_pairs + 1e-3)
@@ -118,3 +106,15 @@ def plot_mAP(mAP, dims):
     plt.plot(dims, mAP, 'cd--')
     plt.xlabel('the number of bits')
     plt.ylabel('mAP')
+
+def generate_Wtrue(num_train, num_test, trainLabel, testLabel):
+  Wtrue = np.zeros((num_train, num_test))
+
+  print('calculating Wtrue')
+
+  for i in tqdm(range(num_train)):
+      for j in range(num_test):
+          if trainLabel[i] == testLabel[j]:
+              Wtrue[i, j] = 1
+  return Wtrue
+
