@@ -7,19 +7,27 @@ class AutoEncoder(nn.Module):
     self.target_dim = target_dim
 
     self.encoder = nn.Sequential(
-      nn.Linear(28 * 28, 128),
+      nn.Linear(28 * 28, 392),
+      nn.Tanh(),
+      nn.Linear(392, 196),
+      nn.Tanh(),
+      nn.Linear(196, 128),
       nn.Tanh(),
       nn.Linear(128, 64),
       nn.Tanh(),
-      nn.Linear(64, self.target_dim),
+      nn.Linear(64, TARGET_DIM),
       nn.Sigmoid(),
     )
     self.decoder = nn.Sequential(
-      nn.Linear(self.target_dim, 64),
+      nn.Linear(TARGET_DIM, 64),
       nn.Tanh(),
       nn.Linear(64, 128),
       nn.Tanh(),
-      nn.Linear(128, 28 * 28),
+      nn.Linear(128, 196),
+      nn.Tanh(),
+      nn.Linear(196, 392),
+      nn.Tanh(),
+      nn.Linear(392, 28 * 28),
       nn.Sigmoid(),
     )
 
