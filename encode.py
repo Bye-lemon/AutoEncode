@@ -17,6 +17,8 @@ from plot_graph import plot_graph
 anchor_data, train_data, test_data, num_train, num_test = load_data(DATASETPATH, DOWNLOAD)
 
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
+anchor_loader = Data.DataLoader(dataset=anchor_data, batch_size=BATCH_SIZE, shuffle=False)
+test_loader = Data.DataLoader(dataset=test_data, batch_size=BATCH_SIZE, shuffle=False)
 
 trainLabel = anchor_data.targets.numpy()
 testLabel = test_data.targets.numpy()
@@ -44,7 +46,7 @@ for TARGET_DIM in DIMS:
   process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T)
 
   # get bit
-  trainY, testY = get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, encoder)
+  trainY, testY = get_bit(num_train, num_test, TARGET_DIM, anchor_loader, test_loader, encoder)
 
   # for evaluation
 
