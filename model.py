@@ -71,13 +71,15 @@ class Encoder(nn.Module):
       nn.BatchNorm2d(self.dim_h * 8),
       nn.ReLU(True),
     )
-    self.fc = nn.Linear(self.dim_h * (2 ** 3), self.n_z)
+    self.fc = nn.Sequential(
+      nn.Linear(self.dim_h * (2 ** 3), self.n_z),
+      nn.Sigmoid()
+    )
 
   def forward(self, x):
     x = self.main(x)
     x = x.squeeze()
     x = self.fc(x)
-    x = nn.Sigmoid(x)
     return x
 
 class Decoder(nn.Module):
