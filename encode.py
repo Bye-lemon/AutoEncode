@@ -6,7 +6,7 @@ import torch.utils.data as Data
 import torchvision
 
 from hashing_utils import *
-from model import AutoEncoder
+from model import Encoder, Decoder
 from parameter import *
 from load_data import load_data
 from process import process
@@ -31,14 +31,17 @@ mAP_dims =[]
 
 for TARGET_DIM in DIMS:
   # define net work
-  autocoder = AutoEncoder(TARGET_DIM)
+  # autocoder = AutoEncoder(TARGET_DIM)
+  encoder = Encoder(TARGET_DIM)
+  decoder = Decoder(TARGET_DIM)
 
-  optimizer = torch.optim.Adam(autocoder.parameters(), lr=LR)
+  enc_optimizer = torch.optim.Adam(encoder.parameters(), lr=LR)
+  dec_optimizer = torch.optim.Adam(decoder.parameters(), lr=LR)
   mseLoss_fun = nn.MSELoss()
   tripletLoss_fun = nn.TripletMarginLoss(margin=MARGIN, p=1)
 
   # training network
-  process(autocoder, optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T)
+  process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T)
 
   # get bit
   trainY, testY = get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, autocoder)
