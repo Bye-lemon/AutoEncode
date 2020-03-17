@@ -32,8 +32,8 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = Encoder(TARGET_DIM)
-  decoder = Decoder(TARGET_DIM)
+  encoder = Encoder(TARGET_DIM).cuda()
+  decoder = Decoder(TARGET_DIM).cuda()
 
   enc_optimizer = torch.optim.Adam(encoder.parameters(), lr=LR)
   dec_optimizer = torch.optim.Adam(decoder.parameters(), lr=LR)
@@ -44,7 +44,7 @@ for TARGET_DIM in DIMS:
   process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T)
 
   # get bit
-  trainY, testY = get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, autocoder)
+  trainY, testY = get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, encoder)
 
   # for evaluation
 

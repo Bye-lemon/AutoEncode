@@ -1,8 +1,8 @@
 def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T):
   for epoch in range(EPOCH):
     for step, x in enumerate(train_loader):
-      b_x = x.view(BATCH_SIZE, 3, 1, 28, 28)
-      b_y = x.view(BATCH_SIZE, 3, 1, 28, 28)
+      b_x = x.view(BATCH_SIZE, 3, 1, 28, 28).cuda()
+      b_y = x.view(BATCH_SIZE, 3, 1, 28, 28).cuda()
 
       anc_encoded = encoder(b_x[:, 0])
       anc_decoded = decoder(anc_encoded)
