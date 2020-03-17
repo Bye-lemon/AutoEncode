@@ -28,4 +28,3 @@ def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, triplet
 
       if step % 100 == 0:
         print('Epoch: {}, train_loss: {}'.format(epoch, loss.cpu().data.numpy()))
-        print(anc_encoded.size())
