@@ -1,14 +1,14 @@
 def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T):
   for epoch in range(EPOCH):
     for step, x in enumerate(train_loader):
-      b_x = x.view(BATCH_SIZE, 3, 28 * 28)
-      b_y = x.view(BATCH_SIZE, 3, 28 * 28)
+      b_x = x.view(BATCH_SIZE, 3, 28, 28)
+      b_y = x.view(BATCH_SIZE, 3, 28, 28)
 
-      anc_encoded = encoder(b_x[:, 0, :])
+      anc_encoded = encoder(torch.unsqueeze(b_x[:, 0], 1))
       anc_decoded = decoder(anc_encoded)
-      pos_encoded = encoder(b_x[:, 1, :])
+      pos_encoded = encoder(torch.unsqueeze(b_x[:, 1], 1))
       pos_decoded = decoder(pos_encoded)
-      neg_encoded = encoder(b_x[:, 2, :])
+      neg_encoded = encoder(torch.unsqueeze(b_x[:, 2], 1))
       neg_decoded = decoder(neg_encoded)
       # (anc_encoded, anc_decoded, pos_encoded,
       # pos_decoded, neg_encoded, neg_decoded) = autocoder(b_x)
