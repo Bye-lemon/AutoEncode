@@ -8,16 +8,16 @@ def get_bit(num_train, num_test, TARGET_DIM, anchor_data, test_data, encoder):
   testY = torch.empty(num_test, TARGET_DIM)
 
   for index, (x, label) in enumerate(anchor_data):
-    x = x.view(1, 1, 28, 28)
+    x = x.view(1, 1, 28, 28).cuda()
     encoded = encoder(x)
-    trainY[index] = encoded
+    trainY[index] = encoded[0]
 
   print('after mking trainY')
 
   for index, (x, label) in enumerate(test_data):
-    x = x.view(1, 1, 28, 28)
+    x = x.view(1, 1, 28, 28).cuda()
     encoded = encoder(x)
-    testY[index] = encoded
+    testY[index] = encoded[0]
 
   print('after mking testY')
 

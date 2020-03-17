@@ -7,11 +7,10 @@ if not(os.path.exists(DATASETPATH)) or not os.listdir(DATASETPATH):
   # nor dir or dir is empty
   DOWNLOAD = True
 
-EPOCH = 3
+EPOCH = 1
 BATCH_SIZE = 50
 LR = 0.005
 
-TARGET_DIM = 8
 MARGIN = 1
 LAMBDA_T = 3
 

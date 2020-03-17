@@ -27,4 +27,5 @@ def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, triplet
       dec_optimizer.step()
 
       if step % 100 == 0:
-        print('Epoch: {}, train_loss: {}'.format(epoch, loss.data.numpy()))
+        print('Epoch: {}, train_loss: {}'.format(epoch, loss.cpu().data.numpy()))
+        print(anc_encoded.size())
