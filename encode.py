@@ -45,6 +45,10 @@ for TARGET_DIM in DIMS:
   # training network
   process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T)
 
+  torch.save(encoder, './nets/encoder.pkl')
+  torch.save(decoder, './nets/decoder.pkl')
+
+  input()
   # get bit
   trainY, testY = get_bit(num_train, num_test, TARGET_DIM, anchor_loader, test_loader, encoder)
 

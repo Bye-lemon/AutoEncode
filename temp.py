@@ -44,56 +44,80 @@ test_data = torchvision.datasets.FashionMNIST(
 
 num_test = test_data.targets.size().numel()
 
-class AutoEncoder(nn.Module):
-  def __init__(self):
-    super(AutoEncoder, self).__init__()
+class Encoder(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=128):
+    super(Encoder, self).__init__()
 
-    self.encoder = nn.Sequential(
-      nn.Linear(28 * 28, 392),
-      nn.Tanh(),
-      nn.Linear(392, 196),
-      nn.Tanh(),
-      nn.Linear(196, 128),
-      nn.Tanh(),
-      nn.Linear(128, 64),
-      nn.Tanh(),
-      nn.Linear(64, TARGET_DIM),
-      nn.Sigmoid(),
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self.main = nn.Sequential(
+      nn.Conv2d(self.n_channel, self.dim_h, 4, 2, 1, bias=False),
+      nn.ReLU(True),
+      nn.Conv2d(self.dim_h, self.dim_h * 2, 4, 2, 1, bias=False),
+      nn.BatchNorm2d(self.dim_h * 2),
+      nn.ReLU(True),
+      nn.Conv2d(self.dim_h * 2, self.dim_h * 4, 4, 2, 1, bias=False),
+      nn.BatchNorm2d(self.dim_h * 4),
+      nn.ReLU(True),
+      nn.Conv2d(self.dim_h * 4, self.dim_h * 8, 4, 2, 1, bias=False),
+      nn.BatchNorm2d(self.dim_h * 8),
+      nn.ReLU(True),
     )
-    self.decoder = nn.Sequential(
-      nn.Linear(TARGET_DIM, 64),
-      nn.Tanh(),
-      nn.Linear(64, 128),
-      nn.Tanh(),
-      nn.Linear(128, 196),
-      nn.Tanh(),
-      nn.Linear(196, 392),
-      nn.Tanh(),
-      nn.Linear(392, 28 * 28),
-      nn.Sigmoid(),
+    self.fc = nn.Sequential(
+      nn.Linear(self.dim_h * (2 ** 3), self.n_z),
+      nn.Sigmoid()
     )
 
   def forward(self, x):
-    anc_encode = self.encoder(x[:, 0, :])
-    anc_decode = self.decoder(anc_encode)
-    pos_encode = self.encoder(x[:, 1, :])
-    pos_decode = self.decoder(pos_encode)
-    neg_encode = self.encoder(x[:, 2, :])
-    neg_decode = self.decoder(neg_encode)
-    return anc_encode, anc_decode, pos_encode, pos_decode, neg_encode, neg_decode
+    x = self.main(x)
+    x = x.squeeze()
+    x = self.fc(x)
+    return x
 
+class Decoder(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=128):
+    super(Decoder, self).__init__()
 
-autocoder = torch.load('autoencoder.pkl')
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self.proj = nn.Sequential(
+      nn.Linear(self.n_z, self.dim_h * 8 * 7 * 7),
+      nn.ReLU()
+    )
+
+    self.main = nn.Sequential(
+      nn.ConvTranspose2d(self.dim_h * 8, self.dim_h * 4, 4),
+      nn.BatchNorm2d(self.dim_h * 4),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(self.dim_h * 4, self.dim_h * 2, 4),
+      nn.BatchNorm2d(self.dim_h * 2),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(self.dim_h * 2, 1, 4, stride=2),
+      nn.Sigmoid()
+    )
+
+  def forward(self, x):
+    x = self.proj(x)
+    x = x.view(-1, self.dim_h * 8, 7, 7)
+    x = self.main(x)
+    return x
+
+encoder = torch.load('./nets/encoder.pkl')
+decoder = torch.load('./nets/decoder.pkl')
 
 N_TEST_IMG = 10
 f, a = plt.subplots(2, N_TEST_IMG, figsize=(5, 2))
-view_data = anchor_data.data[:N_TEST_IMG].view(-1, 28*28).type(torch.FloatTensor)/255.
+view_data = anchor_data.data[:N_TEST_IMG].view(1, 1, 28, 28).type(torch.FloatTensor)/255.
 for i in range(N_TEST_IMG):
   a[0][i].imshow(np.reshape(view_data.data.numpy()[i], (28, 28)), cmap='gray'); a[0][i].set_xticks(()); a[0][i].set_yticks(())
 
 for i in range(N_TEST_IMG):
-  code = autocoder.encoder(view_data[i])
-  out = autocoder.decoder(code)
+  code = encoder(view_data[i])
+  out = decoder(code)
   out *= 255
   a[1][i].imshow(np.reshape(out.data.numpy(), (28, 28)), cmap='gray'); a[1][i].set_xticks(()); a[1][i].set_yticks(())
 
