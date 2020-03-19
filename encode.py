@@ -6,13 +6,14 @@ import torch.utils.data as Data
 import torchvision
 
 from hashing_utils import *
-from model import Encoder, Decoder
 from parameter import *
+from model import Encoder, Decoder
 from load_data import load_data
 from process import process
 from get_bits import get_bit
 from evaluate import evaluate
 from plot_graph import plot_graph
+
 
 anchor_data, train_data, test_data, num_train, num_test = load_data(DATASETPATH, DOWNLOAD)
 
@@ -24,7 +25,7 @@ trainLabel = anchor_data.targets.numpy()
 testLabel = test_data.targets.numpy()
 
 # for evaluation
-Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
@@ -45,8 +46,8 @@ for TARGET_DIM in DIMS:
   # training network
   process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T)
 
-  torch.save(encoder, './nets/encoder.pkl')
-  torch.save(decoder, './nets/decoder.pkl')
+  torch.save(encoder.state_dict(), './nets/encoder_params.pkl')
+  torch.save(decoder.state_dict(), './nets/decoder_params.pkl')
 
   input()
   # get bit

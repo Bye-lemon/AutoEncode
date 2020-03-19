@@ -106,20 +106,24 @@ class Decoder(nn.Module):
     x = self.main(x)
     return x
 
-encoder = torch.load('./nets/encoder.pkl')
-decoder = torch.load('./nets/decoder.pkl')
+encoder = Encoder(12)
+decoder = Decoder(12)
+
+encoder.load_state_dict(torch.load('./nets/encoder_params.pkl'))
+decoder.load_state_dict(torch.load('./nets/decoder_params.pkl'))
 
 N_TEST_IMG = 10
 f, a = plt.subplots(2, N_TEST_IMG, figsize=(5, 2))
-view_data = anchor_data.data[:N_TEST_IMG].view(1, 1, 28, 28).type(torch.FloatTensor)/255.
+view_data = anchor_data.data[:N_TEST_IMG].view(10, 1, 28, 28).type(torch.FloatTensor)/255.
+print(view_data.size())
 for i in range(N_TEST_IMG):
   a[0][i].imshow(np.reshape(view_data.data.numpy()[i], (28, 28)), cmap='gray'); a[0][i].set_xticks(()); a[0][i].set_yticks(())
 
+code = encoder(view_data)
+out = decoder(code)
+out *= 255
 for i in range(N_TEST_IMG):
-  code = encoder(view_data[i])
-  out = decoder(code)
-  out *= 255
-  a[1][i].imshow(np.reshape(out.data.numpy(), (28, 28)), cmap='gray'); a[1][i].set_xticks(()); a[1][i].set_yticks(())
+  a[1][i].imshow(np.reshape(out.data[i].numpy(), (28, 28)), cmap='gray'); a[1][i].set_xticks(()); a[1][i].set_yticks(())
 
 plt.show()
 input()
