@@ -19,7 +19,7 @@ def load_data(dataset_path, DOWNLOAD):
     root=dataset_path,
     train=True,
     transform=torchvision.transforms.Compose([
-      torchvision.transforms.RandomRotation(180),
+      torchvision.transforms.RandomRotation(180,fill=(0,)),
       torchvision.transforms.ToTensor()
     ]),
   )

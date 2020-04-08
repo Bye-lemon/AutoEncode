@@ -25,7 +25,7 @@ trainLabel = anchor_data.targets.numpy()
 testLabel = test_data.targets.numpy()
 
 # for evaluation
-# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
@@ -35,8 +35,11 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = Encoder(TARGET_DIM).cuda()
-  decoder = Decoder(TARGET_DIM).cuda()
+  encoder = Encoder(TARGET_DIM)
+  decoder = Decoder(TARGET_DIM)
+  if torch.cuda.is_available():
+    encoder = encoder.cuda()
+    decoder = decoder.cuda()
 
   enc_optimizer = torch.optim.Adam(encoder.parameters(), lr=LR)
   dec_optimizer = torch.optim.Adam(decoder.parameters(), lr=LR)
@@ -44,12 +47,12 @@ for TARGET_DIM in DIMS:
   tripletLoss_fun = nn.TripletMarginLoss(margin=MARGIN, p=1)
 
   # training network
-  process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, EPOCH, BATCH_SIZE, LAMBDA_T)
+  process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader)
 
-  torch.save(encoder.state_dict(), './nets/encoder_params.pkl')
-  torch.save(decoder.state_dict(), './nets/decoder_params.pkl')
+  # torch.save(encoder.state_dict(), './nets/encoder_params.pkl')
+  # torch.save(decoder.state_dict(), './nets/decoder_params.pkl')
 
-  input()
+  # input()
   # get bit
   trainY, testY = get_bit(num_train, num_test, TARGET_DIM, anchor_loader, test_loader, encoder)
 
