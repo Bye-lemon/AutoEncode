@@ -47,7 +47,7 @@ for TARGET_DIM in DIMS:
   tripletLoss_fun = nn.TripletMarginLoss(margin=MARGIN, p=1)
 
   # training network
-  process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader)
+  process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, TARGET_DIM)
 
   # torch.save(encoder.state_dict(), './nets/encoder_params.pkl')
   # torch.save(decoder.state_dict(), './nets/decoder_params.pkl')

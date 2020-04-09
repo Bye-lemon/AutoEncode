@@ -1,7 +1,7 @@
 import torch
 from parameter import *
 
-def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader):
+def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, n_dim):
   for epoch in range(EPOCH):
     for step, x in enumerate(train_loader):
       b_x = x.view(BATCH_SIZE, 3, 1, 28, 28)
@@ -26,11 +26,15 @@ def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, triplet
 
       triplet_loss = tripletLoss_fun(anc_encoded, pos_encoded, neg_encoded)
 
+      Eyes = 3 * BATCH_SIZE * torch.eye(n_dim)
+      if torch.cuda.is_available():
+        Eyes = Eyes.cuda()
+
       uncorrelated_loss = torch.sum(torch.abs(
-        anc_encoded.mm(anc_encoded.transpose(0, 1)) + \
-        pos_encoded.mm(pos_encoded.transpose(0, 1)) + \
-        neg_encoded.mm(neg_encoded.transpose(0, 1)) - \
-        3 * torch.eye(BATCH_SIZE)
+        anc_encoded.transpose(0, 1).mm(anc_encoded) + \
+        pos_encoded.transpose(0, 1).mm(pos_encoded) + \
+        neg_encoded.transpose(0, 1).mm(neg_encoded) - \
+        Eyes
       ))
 
       var_loss = torch.sum(torch.var(anc_encoded, 0)) + \
@@ -45,7 +49,7 @@ def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, triplet
 
       loss = encode_loss + \
              LAMBDA_T * triplet_loss + \
-             LAMBDA_U * uncorrelated_loss + \
+             LAMBDA_U * uncorrelated_loss - \
              LAMBDA_V * var_loss + \
              LAMBDA_Z * zero_loss
       
