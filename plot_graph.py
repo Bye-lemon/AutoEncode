@@ -1,5 +1,6 @@
 from hashing_utils import plot_mAP, plot_precision_number, plot_precision_recall, plot_recall_number
 import matplotlib.pyplot as plt
+from parameter import *
 
 def plot_graph(database_name, dims, lambda_T, poses, precision_dims, recall_dims, pre_dims, rec_dims, mAP_dims):
   n_dims = len(dims)
@@ -10,7 +11,7 @@ def plot_graph(database_name, dims, lambda_T, poses, precision_dims, recall_dims
 
   fig = plt.figure(num=1, figsize=(21, 14), dpi=80)
   ticks = [i for i in range(n_dims)]
-  fig.suptitle('db_name:{},lambda_T:{}'.format(database_name, lambda_T))
+  fig.suptitle('db_name:{},lambda_T:{},lambda_U:{},lambda_V:{},lambda_Z:{}'.format(database_name, lambda_T,lambda_U, lambda_V, lambda_Z))
   methods_names = []
 
   # plot MAP 

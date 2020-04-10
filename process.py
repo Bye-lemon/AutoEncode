@@ -31,9 +31,9 @@ def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, triplet
         Eyes = Eyes.cuda()
 
       uncorrelated_loss = torch.sum(torch.abs(
-        anc_encoded.transpose(0, 1).mm(anc_encoded) + \
-        pos_encoded.transpose(0, 1).mm(pos_encoded) + \
-        neg_encoded.transpose(0, 1).mm(neg_encoded) - \
+        torch.abs(anc_encoded.transpose(0, 1).mm(anc_encoded)) + \
+        torch.abs(pos_encoded.transpose(0, 1).mm(pos_encoded)) + \
+        torch.abs(neg_encoded.transpose(0, 1).mm(neg_encoded)) - \
         Eyes
       ))
 
