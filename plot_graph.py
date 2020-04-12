@@ -11,7 +11,7 @@ def plot_graph(database_name, dims, lambda_T, poses, precision_dims, recall_dims
 
   fig = plt.figure(num=1, figsize=(21, 14), dpi=80)
   ticks = [i for i in range(n_dims)]
-  fig.suptitle('db_name:{},lambda_T:{},lambda_U:{},lambda_V:{},lambda_Z:{}'.format(database_name, lambda_T,lambda_U, lambda_V, lambda_Z))
+  fig.suptitle('db_name:{},lambda_T:{},lambda_U:{},lambda_V:{},lambda_Z:{}'.format(database_name, lambda_T,LAMBDA_U, LAMBDA_V, LAMBDA_Z))
   methods_names = []
 
   # plot MAP 
