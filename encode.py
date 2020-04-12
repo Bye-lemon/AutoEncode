@@ -7,7 +7,7 @@ import torchvision
 
 from hashing_utils import *
 from parameter import *
-from model import Encoder, Decoder
+from model import Encoder, Decoder, ResEncoder
 from load_data import load_data
 from process import process
 from get_bits import get_bit
@@ -25,7 +25,7 @@ trainLabel = anchor_data.targets.numpy()
 testLabel = test_data.targets.numpy()
 
 # for evaluation
-Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
