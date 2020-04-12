@@ -7,7 +7,7 @@ import torchvision
 
 from hashing_utils import *
 from parameter import *
-from model import Encoder, Decoder, ResEncoder
+from model import Encoder, Decoder, ResEncoder, ResDecoder, DenseEncoder
 from load_data import load_data
 from process import process
 from get_bits import get_bit
@@ -35,7 +35,7 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = Encoder(TARGET_DIM)
+  encoder = DenseEncoder(TARGET_DIM)
   decoder = Decoder(TARGET_DIM)
   if torch.cuda.is_available():
     encoder = encoder.cuda()
