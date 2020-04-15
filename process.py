@@ -41,11 +41,11 @@ def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, triplet
                  torch.sum(torch.var(pos_encoded, 0)) + \
                  torch.sum(torch.var(neg_encoded, 0))
 
-      zero_loss = torch.sum(
-        (torch.abs(anc_encoded) - torch.ones_like(anc_encoded)) ** 2 + \
-        (torch.abs(pos_encoded) - torch.ones_like(pos_encoded)) ** 2 + \
-        (torch.abs(neg_encoded) - torch.ones_like(neg_encoded)) ** 2
-      )
+      zero_loss = ((
+        torch.sum(anc_encoded) + \
+        torch.sum(pos_encoded) + \
+        torch.sum(neg_encoded)
+      ) / (3 * BATCH_SIZE * n_dim)) ** 2
 
       loss = encode_loss + \
              LAMBDA_T * triplet_loss + \
