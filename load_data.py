@@ -51,3 +51,25 @@ def load_data(dataset_path, DOWNLOAD):
   num_test = test_data.targets.size().numel()
 
   return anchor_data, train_data, test_data, num_train, num_test
+
+def load_data_no_triplet(dataset_path, DOWNLOAD):
+
+  # 载入anchor数据
+  train_data = torchvision.datasets.FashionMNIST(
+    root=dataset_path,
+    train=True,
+    transform=torchvision.transforms.ToTensor(),
+    download=DOWNLOAD,
+  )
+
+  num_train = train_data.targets.size().numel()
+
+  test_data = torchvision.datasets.FashionMNIST(
+    root=dataset_path,
+    train=False,
+    transform=torchvision.transforms.ToTensor(),
+  )
+
+  num_test = test_data.targets.size().numel()
+
+  return train_data, test_data, num_train, num_test
