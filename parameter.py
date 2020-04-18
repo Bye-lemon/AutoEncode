@@ -1,7 +1,9 @@
 import os
 
-DATASETNAME = 'FashionMnist'
-DATASETPATH = './fashion_mnist/'
+# DATASETNAME = 'FashionMnist'
+# DATASETPATH = './fashion_mnist/'
+DATASETNAME = 'CIFAR10'
+DATASETPATH = './cifar_10'
 DOWNLOAD = False
 if not(os.path.exists(DATASETPATH)) or not os.listdir(DATASETPATH):
   # nor dir or dir is empty

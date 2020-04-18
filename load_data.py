@@ -4,25 +4,56 @@ import random
 import torch
 import torchvision
 
-def load_data(dataset_path, DOWNLOAD):
+def load_data(dataset_name, dataset_path, DOWNLOAD):
+  if dataset_name == 'FashionMnist':
+    # 载入anchor数据
+    anchor_data = torchvision.datasets.FashionMNIST(
+      root=dataset_path,
+      train=True,
+      transform=torchvision.transforms.ToTensor(),
+      download=DOWNLOAD,
+    )
 
-  # 载入anchor数据
-  anchor_data = torchvision.datasets.FashionMNIST(
-    root=dataset_path,
-    train=True,
-    transform=torchvision.transforms.ToTensor(),
-    download=DOWNLOAD,
-  )
+    #载入加过旋转的数据,作为正例
+    positive_data = torchvision.datasets.FashionMNIST(
+      root=dataset_path,
+      train=True,
+      transform=torchvision.transforms.Compose([
+        torchvision.transforms.RandomRotation(180,fill=(0,)),
+        torchvision.transforms.ToTensor()
+      ]),
+    )
 
-  #载入加过旋转的数据,作为正例
-  positive_data = torchvision.datasets.FashionMNIST(
-    root=dataset_path,
-    train=True,
-    transform=torchvision.transforms.Compose([
-      torchvision.transforms.RandomRotation(180,fill=(0,)),
-      torchvision.transforms.ToTensor()
-    ]),
-  )
+    test_data = torchvision.datasets.FashionMNIST(
+      root=dataset_path,
+      train=False,
+      transform=torchvision.transforms.ToTensor(),
+    )
+  elif dataset_name == 'CIFAR10':
+    # 载入anchor数据
+    anchor_data = torchvision.datasets.CIFAR10(
+      root=dataset_path,
+      train=True,
+      transform=torchvision.transforms.ToTensor(),
+      download=DOWNLOAD,
+    )
+
+    #载入加过旋转的数据,作为正例
+    positive_data = torchvision.datasets.CIFAR10(
+      root=dataset_path,
+      train=True,
+      transform=torchvision.transforms.Compose([
+        torchvision.transforms.RandomRotation(180,fill=(0,)),
+        torchvision.transforms.ToTensor()
+      ]),
+    )
+
+    test_data = torchvision.datasets.CIFAR10(
+      root=dataset_path,
+      train=False,
+      transform=torchvision.transforms.ToTensor(),
+    )
+
 
   # 训练集总数
   num_train = anchor_data.targets.size().numel()
@@ -42,33 +73,43 @@ def load_data(dataset_path, DOWNLOAD):
 
   print('train_data.size : {}'.format(train_data.size()))
 
-  test_data = torchvision.datasets.FashionMNIST(
-    root=dataset_path,
-    train=False,
-    transform=torchvision.transforms.ToTensor(),
-  )
 
   num_test = test_data.targets.size().numel()
 
   return anchor_data, train_data, test_data, num_train, num_test
 
-def load_data_no_triplet(dataset_path, DOWNLOAD):
+def load_data_no_triplet(dataset_name, dataset_path, DOWNLOAD):
 
-  # 载入anchor数据
-  train_data = torchvision.datasets.FashionMNIST(
-    root=dataset_path,
-    train=True,
-    transform=torchvision.transforms.ToTensor(),
-    download=DOWNLOAD,
-  )
+  if dataset_name == 'FashionMnist':
+    # 载入anchor数据
+    train_data = torchvision.datasets.FashionMNIST(
+      root=dataset_path,
+      train=True,
+      transform=torchvision.transforms.ToTensor(),
+      download=DOWNLOAD,
+    )
+
+    test_data = torchvision.datasets.FashionMNIST(
+      root=dataset_path,
+      train=False,
+      transform=torchvision.transforms.ToTensor(),
+    )
+  elif dataset_name == 'CIFAR10':
+    # 载入anchor数据
+    train_data = torchvision.datasets.CIFAR10(
+      root=dataset_path,
+      train=True,
+      transform=torchvision.transforms.ToTensor(),
+      download=DOWNLOAD,
+    )
+
+    test_data = torchvision.datasets.CIFAR10(
+      root=dataset_path,
+      train=False,
+      transform=torchvision.transforms.ToTensor(),
+    )
 
   num_train = train_data.targets.size().numel()
-
-  test_data = torchvision.datasets.FashionMNIST(
-    root=dataset_path,
-    train=False,
-    transform=torchvision.transforms.ToTensor(),
-  )
 
   num_test = test_data.targets.size().numel()
 
