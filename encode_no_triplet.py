@@ -15,7 +15,7 @@ from evaluate import evaluate
 from plot_graph import plot_graph
 
 
-train_data, test_data, num_train, num_test = load_data_no_triplet(DATASETPATH, DOWNLOAD)
+train_data, test_data, num_train, num_test = load_data_no_triplet(DATASETNAME, DATASETPATH, DOWNLOAD)
 
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 test_loader = Data.DataLoader(dataset=test_data, batch_size=BATCH_SIZE, shuffle=False)
@@ -24,7 +24,7 @@ trainLabel = train_data.targets.numpy()
 testLabel = test_data.targets.numpy()
 
 # for evaluation
-Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []

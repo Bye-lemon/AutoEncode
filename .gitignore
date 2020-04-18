@@ -2,3 +2,4 @@ fashion_mnist/
 __pycache__/
 nets/
 result/
+cifar_10/

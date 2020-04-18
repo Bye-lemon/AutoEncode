@@ -15,7 +15,7 @@ from evaluate import evaluate
 from plot_graph import plot_graph
 
 
-anchor_data, train_data, test_data, num_train, num_test = load_data(DATASETPATH, DOWNLOAD)
+anchor_data, train_data, test_data, num_train, num_test = load_data(DATASETNAME, DATASETPATH, DOWNLOAD)
 
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 anchor_loader = Data.DataLoader(dataset=anchor_data, batch_size=BATCH_SIZE, shuffle=False)
