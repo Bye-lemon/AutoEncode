@@ -25,7 +25,7 @@ trainLabel = anchor_data.targets.numpy()
 testLabel = test_data.targets.numpy()
 
 # for evaluation
-# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
@@ -35,7 +35,7 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = DenseEncoder(TARGET_DIM)
+  encoder = Encoder(TARGET_DIM)
   decoder = Decoder(TARGET_DIM)
   if torch.cuda.is_available():
     encoder = encoder.cuda()

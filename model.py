@@ -130,7 +130,7 @@ class ResEncoder(nn.Module):
       nn.ReLU(True),
     )
     # 7 * 7 -> 7 * 7
-    self.layer1 = self._make_layer(BasicBlock, self.dim_h, 3)
+    self.layer1 = self._make_layer(BasicBlock, self.dim_h * 2, 3)
     self.relu = nn.ReLU(True)
     self.fc = nn.Sequential(
       nn.Linear(self.dim_h * 2 * 7 * 7, self.n_z),

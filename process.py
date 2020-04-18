@@ -69,7 +69,7 @@ def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, triplet
 
 def process_no_triplet(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, train_loader, n_dim):
   for epoch in range(EPOCH):
-    for step, x in enumerate(train_loader):
+    for step, (x, y) in enumerate(train_loader):
       b_x = x.view(BATCH_SIZE, 1, 28, 28)
       b_y = x.view(BATCH_SIZE, 1, 28, 28)
       if torch.cuda.is_available():
