@@ -34,7 +34,7 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = Encoder(TARGET_DIM)
+  encoder = ResEncoder(TARGET_DIM)
   decoder = Decoder(TARGET_DIM)
   if torch.cuda.is_available():
     encoder = encoder.cuda()

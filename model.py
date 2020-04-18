@@ -121,6 +121,12 @@ class ResEncoder(nn.Module):
     self.dim_h = dim_h
     self.n_z = n_z
 
+    self._norm_layer = nn.BatchNorm2d
+    self.dilation = 1
+    self.inplanes = self.dim_h * 2
+    self.groups = 1
+    self.base_width = 64
+
     # 28 * 28 -> 7 * 7
     self.block1 = nn.Sequential(
       nn.Conv2d(self.n_channel, self.dim_h, kernel_size=4, stride=2, padding=1, bias=False),
@@ -140,7 +146,6 @@ class ResEncoder(nn.Module):
   def forward(self, x):
     x = self.block1(x)
     out = self.layer1(x)
-    out = self.relu(out)
     out = out.view(-1, self.dim_h * 2 * 7 * 7)
     out = self.fc(out)
     return out 
