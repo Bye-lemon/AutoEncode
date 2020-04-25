@@ -103,7 +103,7 @@ class Decoder(nn.Module):
       nn.ConvTranspose2d(self.dim_h * 4, self.dim_h * 2, 4),
       nn.BatchNorm2d(self.dim_h * 2),
       nn.ReLU(True),
-      nn.ConvTranspose2d(self.dim_h * 2, 1, 4, stride=2),
+      nn.ConvTranspose2d(self.dim_h * 2, self.n_channel, 4, stride=2),
       nn.Sigmoid()
     )
 

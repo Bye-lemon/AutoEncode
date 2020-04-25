@@ -20,8 +20,13 @@ train_data, test_data, num_train, num_test = load_data_no_triplet(DATASETNAME, D
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 test_loader = Data.DataLoader(dataset=test_data, batch_size=BATCH_SIZE, shuffle=False)
 
-trainLabel = train_data.targets.numpy()
-testLabel = test_data.targets.numpy()
+if DATASETNAME == 'FashionMnist':
+  trainLabel = train_data.targets.numpy()
+  testLabel = test_data.targets.numpy()
+elif DATASETNAME == 'CIFAR10':
+  trainLabel = train_data.targets
+  testLabel = test_data.targets
+
 
 # for evaluation
 # Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
@@ -34,8 +39,8 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = ResEncoder(TARGET_DIM)
-  decoder = Decoder(TARGET_DIM)
+  encoder = Encoder(TARGET_DIM, CHANNEL)
+  decoder = Decoder(TARGET_DIM, CHANNEL)
   if torch.cuda.is_available():
     encoder = encoder.cuda()
     decoder = decoder.cuda()

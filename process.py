@@ -4,8 +4,8 @@ from parameter import *
 def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, tripletLoss_fun, train_loader, n_dim):
   for epoch in range(EPOCH):
     for step, x in enumerate(train_loader):
-      b_x = x.view(BATCH_SIZE, 3, 1, 28, 28)
-      b_y = x.view(BATCH_SIZE, 3, 1, 28, 28)
+      b_x = x
+      b_y = x
       if torch.cuda.is_available():
         b_x = b_x.cuda()
         b_y = b_y.cuda()
@@ -70,8 +70,8 @@ def process(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, triplet
 def process_no_triplet(encoder, enc_optimizer, decoder, dec_optimizer, mseLoss_fun, train_loader, n_dim):
   for epoch in range(EPOCH):
     for step, (x, y) in enumerate(train_loader):
-      b_x = x.view(BATCH_SIZE, 1, 28, 28)
-      b_y = x.view(BATCH_SIZE, 1, 28, 28)
+      b_x = x
+      b_y = x
       if torch.cuda.is_available():
         b_x = b_x.cuda()
         b_y = b_y.cuda()

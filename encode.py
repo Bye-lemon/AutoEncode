@@ -21,11 +21,15 @@ train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffl
 anchor_loader = Data.DataLoader(dataset=anchor_data, batch_size=BATCH_SIZE, shuffle=False)
 test_loader = Data.DataLoader(dataset=test_data, batch_size=BATCH_SIZE, shuffle=False)
 
-trainLabel = anchor_data.targets.numpy()
-testLabel = test_data.targets.numpy()
+if DATASETNAME == 'FashionMnist':
+  trainLabel = anchor_data.targets.numpy()
+  testLabel = test_data.targets.numpy()
+elif DATASETNAME == 'CIFAR10':
+  trainLabel = anchor_data.targets
+  testLabel = test_data.targets
 
 # for evaluation
-Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
@@ -35,8 +39,8 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = Encoder(TARGET_DIM)
-  decoder = Decoder(TARGET_DIM)
+  encoder = Encoder(TARGET_DIM, CHANNEL)
+  decoder = Decoder(TARGET_DIM, CHANNEL)
   if torch.cuda.is_available():
     encoder = encoder.cuda()
     decoder = decoder.cuda()
