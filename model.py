@@ -182,28 +182,60 @@ class ResDecoder(nn.Module):
     self.dim_h = dim_h
     self.n_z = n_z
 
+    self._norm_layer = nn.BatchNorm2d
+    self.dilation = 1
+    self.inplanes = self.dim_h * 2
+    self.groups = 1
+    self.base_width = 64
+
     self.proj = nn.Sequential(
-      nn.Linear(self.n_z, self.dim_h * 7 * 7),
+      nn.Linear(self.n_z, self.dim_h * 2 * 7 * 7),
       nn.ReLU()
     )
 
+    self.layer1 = self._make_layer(BasicBlock, self.dim_h * 2, 3)
+
     self.main = nn.Sequential(
-      nn.ConvTranspose2d(self.dim_h, self.dim_h, 4),
+      nn.ConvTranspose2d(self.dim_h * 2, self.dim_h, 4),
       nn.BatchNorm2d(self.dim_h),
       nn.ReLU(True),
       nn.ConvTranspose2d(self.dim_h, self.dim_h, 4),
       nn.BatchNorm2d(self.dim_h),
       nn.ReLU(True),
-      nn.ConvTranspose2d(self.dim_h, 1, 4, stride=2),
+      nn.ConvTranspose2d(self.dim_h, self.n_channel, 4, stride=2),
       nn.Sigmoid()
     )
 
   def forward(self, x):
     x = self.proj(x)
-    x = x.view(-1, self.dim_h, 7, 7)
+    x = x.view(-1, self.dim_h * 2, 7, 7)
+    x = self.layer1(x)
     x = self.main(x)
     return x
 
+  def _make_layer(self, block, planes, blocks, stride=1, dilate=False):
+    norm_layer = self._norm_layer
+    downsample = None
+    previous_dilation = self.dilation
+    if dilate:
+      self.dilation *= stride
+      stride = 1
+    if stride != 1 or self.inplanes != planes * block.expansion:
+      downsample = nn.Sequential(
+          conv1x1(self.inplanes, planes * block.expansion, stride),
+          norm_layer(planes * block.expansion),
+      )
+
+    layers = []
+    layers.append(block(self.inplanes, planes, stride, downsample, self.groups,
+                        self.base_width, previous_dilation, norm_layer))
+    self.inplanes = planes * block.expansion
+    for _ in range(1, blocks):
+      layers.append(block(self.inplanes, planes, groups=self.groups,
+                          base_width=self.base_width, dilation=self.dilation,
+                          norm_layer=norm_layer))
+
+    return nn.Sequential(*layers)
 class DenseEncoder(nn.Module):
   def __init__(self, n_z, n_channel=1, dim_h=128):
     super(DenseEncoder, self).__init__()
@@ -259,4 +291,64 @@ class DenseEncoder(nn.Module):
     out = self.layer2(features)
     out = out.view(-1, self.dim_h * 7 * 7)
     out = self.fc(out)
+    return out 
+
+class DenseDecoder(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=128):
+    super(DenseDecoder, self).__init__()
+
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self.proj = nn.Sequential(
+      nn.Linear(self.n_z, self.dim_h * 7 * 7),
+      nn.ReLU()
+    )
+
+    self.layer0 = nn.Sequential(
+      nn.Conv2d(self.dim_h, self.dim_h, kernel_size=1, stride=1, padding=0, bias=False),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+      nn.Conv2d(self.dim_h, self.dim_h, kernel_size=3, stride=1, padding=1, bias=False),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+    )
+    self.layer1 = nn.Sequential(
+      nn.Conv2d(self.dim_h * 2, self.dim_h, kernel_size=1, stride=1, padding=0, bias=False),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+      nn.Conv2d(self.dim_h, self.dim_h, kernel_size=3, stride=1, padding=1, bias=False),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+    )
+    self.layer2 = nn.Sequential(
+      nn.Conv2d(self.dim_h * 3, self.dim_h, kernel_size=1, stride=1, padding=0, bias=False),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+      nn.Conv2d(self.dim_h, self.dim_h, kernel_size=3, stride=1, padding=1, bias=False),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+    )
+    self.main = nn.Sequential(
+      nn.ConvTranspose2d(self.dim_h, self.dim_h, 4),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(self.dim_h, self.dim_h, 4),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(self.dim_h, self.n_channel, 4, stride=2),
+      nn.Sigmoid()
+    )
+
+  def forward(self, x):
+    x = self.proj(x)
+    x = x.view(-1, self.dim_h, 7, 7)
+    features = x
+    new_feature = self.layer0(features)
+    features = torch.cat((features, new_feature), 1)
+    new_feature = self.layer1(features)
+    features = torch.cat((features, new_feature), 1)
+    out = self.layer2(features)
+    out = self.main(out)
     return out 

@@ -7,7 +7,7 @@ import torchvision
 
 from hashing_utils import *
 from parameter import *
-from model import Encoder, Decoder, ResEncoder, ResDecoder, DenseEncoder
+from model import Encoder, Decoder, ResEncoder, ResDecoder, DenseEncoder, DenseDecoder
 from load_data import load_data
 from process import process
 from get_bits import get_bit
