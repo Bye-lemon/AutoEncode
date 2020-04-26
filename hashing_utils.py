@@ -16,6 +16,9 @@ def hamming_dist(X, Y):
 
 def recall_precision(trainY, testY, traingnd, testgnd, Wtrue, hamdis):
     # make sure trangnd and testgnd are flattened
+    if isinstance(testgnd, list):
+      testgnd = np.array(testgnd)
+      traingnd = np.array(traingnd)
     testgnd = testgnd.ravel()
     traingnd = traingnd.ravel()
     ntrain = trainY.shape[0]
@@ -42,6 +45,9 @@ def recall_precision(trainY, testY, traingnd, testgnd, Wtrue, hamdis):
 
 def recall_precision5(trainY, testY, traingnd, testgnd, pos, Wtrue, hamdis):
     # make sure trangnd and testgnd are flattened
+    if isinstance(testgnd, list):
+      testgnd = np.array(testgnd)
+      traingnd = np.array(traingnd)
     testgnd = testgnd.ravel()
     traingnd = traingnd.ravel()
     ntrain = trainY.shape[0]
