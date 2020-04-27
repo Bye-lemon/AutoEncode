@@ -29,7 +29,7 @@ elif DATASETNAME == 'CIFAR10':
 
 
 # for evaluation
-# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
@@ -39,8 +39,8 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = Encoder(TARGET_DIM, CHANNEL)
-  decoder = Decoder(TARGET_DIM, CHANNEL)
+  encoder = ResEncoder(TARGET_DIM, CHANNEL)
+  decoder = ResDecoder(TARGET_DIM, CHANNEL)
   if torch.cuda.is_available():
     encoder = encoder.cuda()
     decoder = decoder.cuda()

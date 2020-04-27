@@ -128,7 +128,10 @@ def load_data_no_triplet(dataset_name, dataset_path, DOWNLOAD):
     test_data = torchvision.datasets.CIFAR10(
       root=dataset_path,
       train=False,
-      transform=torchvision.transforms.ToTensor(),
+      transform=torchvision.transforms.Compose([
+        torchvision.transforms.Resize(28),
+        torchvision.transforms.ToTensor(),
+      ]),
     )
 
     num_train = len(train_data.targets)

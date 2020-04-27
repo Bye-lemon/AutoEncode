@@ -29,7 +29,7 @@ elif DATASETNAME == 'CIFAR10':
   testLabel = test_data.targets
 
 # for evaluation
-# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
