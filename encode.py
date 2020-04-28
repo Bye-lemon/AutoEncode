@@ -7,7 +7,7 @@ import torchvision
 
 from hashing_utils import *
 from parameter import *
-from model import Encoder, Decoder, ResEncoder, ResDecoder, DenseEncoder, DenseDecoder
+from model import Encoder, Decoder, ResEncoder, ResDecoder, DenseEncoder, DenseDecoder, FcEncoder, FcDecoder
 from load_data import load_data
 from process import process
 from get_bits import get_bit
@@ -29,7 +29,7 @@ elif DATASETNAME == 'CIFAR10':
   testLabel = test_data.targets
 
 # for evaluation
-Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
+# Wtrue = generate_Wtrue(num_train, num_test, trainLabel, testLabel)
 precision_dims = []
 recall_dims = []
 pre_dims = []
@@ -39,8 +39,8 @@ mAP_dims =[]
 for TARGET_DIM in DIMS:
   # define net work
   # autocoder = AutoEncoder(TARGET_DIM)
-  encoder = Encoder(TARGET_DIM, CHANNEL)
-  decoder = Decoder(TARGET_DIM, CHANNEL)
+  encoder = FcEncoder(TARGET_DIM, CHANNEL)
+  decoder = FcDecoder(TARGET_DIM, CHANNEL)
   if torch.cuda.is_available():
     encoder = encoder.cuda()
     decoder = decoder.cuda()

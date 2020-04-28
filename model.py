@@ -352,3 +352,50 @@ class DenseDecoder(nn.Module):
     out = self.layer2(features)
     out = self.main(out)
     return out 
+
+class FcEncoder(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=128):
+    super(FcEncoder, self).__init__()
+
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self.main = nn.Sequential(
+      nn.Linear(28*28*self.n_channel, self.dim_h * 8),
+      nn.Tanh(),
+      nn.Linear(self.dim_h * 8, self.dim_h * 4),
+      nn.Tanh(),
+      nn.Linear(self.dim_h * 4, self.dim_h * 2),
+      nn.Tanh(),
+      nn.Linear(self.dim_h * 2, self.n_z),
+      nn.Sigmoid(),
+    )
+
+  def forward(self, x):
+    x = x.view(-1, 28 * 28 * self.n_channel)
+    x = self.main(x)
+    return x
+
+class FcDecoder(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=128):
+    super(FcDecoder, self).__init__()
+
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self.main = nn.Sequential(
+      nn.Linear(self.n_z, self.dim_h * 2),
+      nn.Tanh(),
+      nn.Linear(self.dim_h * 2, self.dim_h * 4),
+      nn.Tanh(),
+      nn.Linear(self.dim_h * 4, self.dim_h * 8),
+      nn.Tanh(),
+      nn.Linear(self.dim_h * 8, 28*28*self.n_channel),
+      nn.Sigmoid(),
+    )
+  def forward(self, x):
+    x = self.main(x)
+    x = x.view(-1, self.n_channel, 28, 28)
+    return x
