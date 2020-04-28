@@ -14,6 +14,13 @@ def plot_graph(database_name, dims, lambda_T, poses, precision_dims, recall_dims
   fig.suptitle('db_name:{},lambda_T:{},lambda_U:{},lambda_V:{},lambda_Z:{}'.format(database_name, lambda_T,LAMBDA_U, LAMBDA_V, LAMBDA_Z))
   methods_names = []
 
+  with open('db_name-{}-lambda_T-{}-lambda_U-{}-lambda_V-{}-lambda_Z-{}.txt'.format(database_name, lambda_T, LAMBDA_U, LAMBDA_V, LAMBDA_Z), 'w') as f:
+      for i in range(n_dims):
+          str1 = 'bits: {}, precision: {}, recall: {}, mAP: {}\n'.format(dims[i], precision_dims[i], recall_dims[i], mAP_dims[i])
+          str2 = 'rec:{}, pre:{}\n'.format(rec_dims[i], pre_dims[i])
+          f.write(str1)
+          f.write(str2)
+
   # plot MAP 
   ax1 = fig.add_subplot(1, 4, 1)
   ax1.set_xlabel('the number of bits')
