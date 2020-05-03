@@ -399,3 +399,70 @@ class FcDecoder(nn.Module):
     x = self.main(x)
     x = x.view(-1, self.n_channel, 28, 28)
     return x
+
+class Encoder1(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=64):
+    super(Encoder1, self).__init__()
+
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self.main = nn.Sequential(
+      nn.Conv2d(self.n_channel, self.dim_h, 5, 1, 2, bias=False),
+      nn.ReLU(True),
+      nn.BatchNorm2d(self.dim_h),
+      nn.MaxPool2d(2, 2),
+      nn.Conv2d(self.dim_h, self.dim_h, 5, 1, 2, bias=False),
+      nn.ReLU(True),
+      nn.BatchNorm2d(self.dim_h),
+      nn.MaxPool2d(2, 2),
+      nn.Conv2d(self.dim_h, self.dim_h, 5, 1, 2, bias=False),
+      nn.ReLU(True),
+      nn.BatchNorm2d(self.dim_h),
+      nn.MaxPool2d(2, 2),
+      nn.Conv2d(self.dim_h, self.dim_h * 2, 5, 1, 2, bias=False),
+      nn.ReLU(True),
+      nn.BatchNorm2d(self.dim_h * 2),
+      nn.MaxPool2d(2, 2),
+    )
+    self.fc = nn.Sequential(
+      nn.Linear(self.dim_h * 2, self.n_z),
+      nn.Sigmoid(),
+    )
+
+  def forward(self, x):
+    x = self.main(x)
+    x = x.squeeze()
+    x = self.fc(x)
+    return x
+
+class Decoder1(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=128):
+    super(Decoder1, self).__init__()
+
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self.proj = nn.Sequential(
+      nn.Linear(self.n_z, self.dim_h * 2 * 7 * 7),
+      nn.ReLU()
+    )
+
+    self.main = nn.Sequential(
+      nn.ConvTranspose2d(self.dim_h * 2, self.dim_h, 4),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(self.dim_h, self.dim_h, 4),
+      nn.BatchNorm2d(self.dim_h),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(self.dim_h, self.n_channel, 4, stride=2),
+      nn.Sigmoid()
+    )
+
+  def forward(self, x):
+    x = self.proj(x)
+    x = x.view(-1, self.dim_h * 2, 7, 7)
+    x = self.main(x)
+    return x
