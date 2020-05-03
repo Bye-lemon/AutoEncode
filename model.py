@@ -466,3 +466,137 @@ class Decoder1(nn.Module):
     x = x.view(-1, self.dim_h * 2, 7, 7)
     x = self.main(x)
     return x
+
+class ResEncoder1(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=16):
+    super(ResEncoder1, self).__init__()
+
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self._norm_layer = nn.BatchNorm2d
+    self.dilation = 1
+    self.inplanes = self.dim_h * 2
+    self.groups = 1
+    self.base_width = 64
+
+    # 28 * 28 -> 28 * 28
+    self.block1 = nn.Sequential(
+      nn.Conv2d(self.n_channel, self.dim_h, kernel_size=3, stride=1, padding=1, bias=False),
+      nn.ReLU(True),
+      nn.BatchNorm2d(self.dim_h),
+    )
+    # 28 * 28 -> 28 * 28
+    self.layer1 = self._make_layer(BasicBlock, self.dim_h, self.dim_h, 3)
+    self.layer2 = self._make_layer(BasicBlock, self.dim_h, self.dim_h * 2, 1)
+    self.layer3 = self._make_layer(BasicBlock, self.dim_h * 2, self.dim_h * 2, 3)
+    self.layer4 = self._make_layer(BasicBlock, self.dim_h * 2, self.dim_h * 4, 1)
+    self.layer5 = self._make_layer(BasicBlock, self.dim_h * 4, self.dim_h * 4, 3)
+    self.relu = nn.ReLU(True)
+    self.bn = nn.BatchNorm2d(self.dim_h * 4)
+    self.fc = nn.Sequential(
+      nn.Linear(self.dim_h * 4 * 28 * 28, self.n_z),
+      nn.Sigmoid()
+    )
+
+  def forward(self, x):
+    x = self.block1(x)
+    out = self.layer1(x)
+    out = self.layer2(out)
+    out = self.layer3(out)
+    out = self.layer4(out)
+    out = self.layer5(out)
+    out = out.view(-1, self.dim_h * 4 * 28 * 28)
+    out = self.fc(out)
+    return out 
+
+  def _make_layer(self, block, inplanes, planes, blocks, stride=1, dilate=False):
+    norm_layer = self._norm_layer
+    downsample = None
+    previous_dilation = self.dilation
+    if dilate:
+      self.dilation *= stride
+      stride = 1
+    if stride != 1 or inplanes != planes * block.expansion:
+      downsample = nn.Sequential(
+          conv1x1(inplanes, planes * block.expansion, stride),
+          norm_layer(planes * block.expansion),
+      )
+
+    layers = []
+    layers.append(block(inplanes, planes, stride, downsample, self.groups,
+                        self.base_width, previous_dilation, norm_layer))
+    inplanes = planes * block.expansion
+    for _ in range(1, blocks):
+      layers.append(block(inplanes, planes, groups=self.groups,
+                          base_width=self.base_width, dilation=self.dilation,
+                          norm_layer=norm_layer))
+
+    return nn.Sequential(*layers)
+
+class ResDecoder1(nn.Module):
+  def __init__(self, n_z, n_channel=1, dim_h=16):
+    super(ResDecoder1, self).__init__()
+
+    self.n_channel = n_channel
+    self.dim_h = dim_h
+    self.n_z = n_z
+
+    self._norm_layer = nn.BatchNorm2d
+    self.dilation = 1
+    self.groups = 1
+    self.base_width = 64
+
+    self.proj = nn.Sequential(
+      nn.Linear(self.n_z, self.dim_h * 4 * 28 * 28),
+      nn.ReLU()
+    )
+
+    self.layer1 = self._make_layer(BasicBlock, self.dim_h * 4, self.dim_h * 4, 3)
+    self.layer2 = self._make_layer(BasicBlock, self.dim_h * 4, self.dim_h * 2, 1)
+    self.layer3 = self._make_layer(BasicBlock, self.dim_h * 2, self.dim_h * 2, 3)
+    self.layer4 = self._make_layer(BasicBlock, self.dim_h * 2, self.dim_h, 1)
+    self.layer5 = self._make_layer(BasicBlock, self.dim_h, self.dim_h, 3)
+    self.relu = nn.ReLU(True)
+    self.bn = nn.BatchNorm2d(self.dim_h * 4)
+
+    self.main = nn.Sequential(
+      nn.Conv2d(self.dim_h, self.n_channel, kernel_size=3, stride=1, padding=1, bias=False),
+      nn.Sigmoid()
+    )
+
+  def forward(self, x):
+    x = self.proj(x)
+    x = x.view(-1, self.dim_h * 4, 28, 28)
+    x = self.layer1(x)
+    x = self.layer2(x)
+    x = self.layer3(x)
+    x = self.layer4(x)
+    x = self.layer5(x)
+    x = self.main(x)
+    return x
+
+  def _make_layer(self, block, inplanes, planes, blocks, stride=1, dilate=False):
+    norm_layer = self._norm_layer
+    downsample = None
+    previous_dilation = self.dilation
+    if dilate:
+      self.dilation *= stride
+      stride = 1
+    if stride != 1 or inplanes != planes * block.expansion:
+      downsample = nn.Sequential(
+          conv1x1(inplanes, planes * block.expansion, stride),
+          norm_layer(planes * block.expansion),
+      )
+
+    layers = []
+    layers.append(block(inplanes, planes, stride, downsample, self.groups,
+                        self.base_width, previous_dilation, norm_layer))
+    inplanes = planes * block.expansion
+    for _ in range(1, blocks):
+      layers.append(block(inplanes, planes, groups=self.groups,
+                          base_width=self.base_width, dilation=self.dilation,
+                          norm_layer=norm_layer))
+
+    return nn.Sequential(*layers)
